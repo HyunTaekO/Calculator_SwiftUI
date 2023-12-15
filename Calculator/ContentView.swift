@@ -10,7 +10,12 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var answerNumber: String = "0"
-    
+    private let buttonData = [["C", "/", "%", "$"],
+                              ["7", "8", "9", "X"],
+                              ["4", "5", "6", "-"],
+                              ["1", "2", "3", "+"],
+                              ["0", "0", ".", "="]]
+                                                    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -23,200 +28,31 @@ struct ContentView: View {
                         .font(.system(size: 73))
                         .foregroundColor(.white)
                 }
-                    
-                HStack {
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("C")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.gray)
-                            .clipShape(.circle)
-                            .foregroundColor(.black)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("±")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.gray)
-                            .clipShape(.circle)
-                            .foregroundColor(.black)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("%")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.gray)
-                            .clipShape(.circle)
-                            .foregroundColor(.black)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("÷")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.orange)
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    
-                
+                ForEach(buttonData, id: \.self) { line in
+                    HStack {
+                        ForEach(line, id: \.self) { item in
+                            Button(action: {
+                                if answerNumber == "0" {
+                                    answerNumber = item
+                                }else {
+                                    answerNumber += item
+                                }
+                            }, label: {
+                                Text(item)
+                                    .frame(width: 80,
+                                           height: 80)
+                                    .background(Color("NumberButton"))
+                                    .clipShape(.circle)
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 33))
+                            })
+                        }
+                    }
                 }
                 
-                HStack {
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("7")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("8")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("9")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("x")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.orange)
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                }
-                
-                HStack {
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("4")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("5")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("6")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("-")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.orange)
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                }
-                
-                HStack {
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("0")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text(" ")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text(".")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(Color("NumberButton"))
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("=")
-                            .frame(width: 80,
-                                   height: 80)
-                            .background(.orange)
-                            .clipShape(.circle)
-                            .foregroundColor(.white)
-                            .font(.system(size: 33))
-                    })
-                }
                 
             }
         }
-        
        
     }
 }
