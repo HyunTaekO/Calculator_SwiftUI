@@ -9,7 +9,7 @@ import SwiftUI
 
 enum ButtonType {
     case one, two, three, four, five, six, seven, eight, nine, zero
-    case clear, not, modular, division, multiplivation, minus, plus, equal, point
+    case clear, not, percent, division, multiplivation, minus, plus, equal, point, none
     
     var displayName: String {
         switch self {
@@ -37,7 +37,7 @@ enum ButtonType {
             return "C"
         case .not:
             return "+/-"
-        case .modular:
+        case .percent:
             return "%"
         case .division:
             return "÷"
@@ -51,13 +51,15 @@ enum ButtonType {
             return "="
         case .point:
             return "."
+        default:
+            return ""
         }
     }
     var backgroundColor: Color {
         switch self {
         case .one, .two, .three, .four, .five, .six, .seven, .eight, .nine, .zero, .point:
             return .numberButton
-        case .clear, .not, .modular:
+        case .clear, .not, .percent:
             return .gray
         default:
             return .orange
@@ -65,10 +67,24 @@ enum ButtonType {
     }
     var foregroundColor: Color {
         switch self {
-        case .clear, .not, .modular:
+        case .clear, .not, .percent:
             return .black
         default:
             return .white
+        }
+    }
+    var isNumber: Bool {
+        if let _ = Int(self.displayName) {
+            return true
+        }
+        return false
+    }
+    var isSingle: Bool {
+        switch self {
+        case .not, .percent, .point, .none:
+            return true
+        default:
+            return false
         }
     }
 }
@@ -76,11 +92,15 @@ enum ButtonType {
 struct ContentView: View {
     
     @State private var answerNumber: String = "0"
-    private let buttonData: [[ButtonType]] = [[.clear, .not, .modular, .division],
+    private let buttonData: [[ButtonType]] = [[.clear, .not, .percent, .division],
                                               [.seven, .eight, .nine, .multiplivation],
                                               [.four, .five, .six, .minus],
                                               [.one, .two, .three, .plus],
-                                              [.zero, .zero, .point, .equal]]
+                                              [.zero, .point, .equal]]
+    @State private var beforeNumber = 0.0
+    @State private var operatorType: ButtonType = .none
+    @State private var isClear = true
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -97,18 +117,41 @@ struct ContentView: View {
                     HStack {
                         ForEach(line, id: \.self) { item in
                             Button(action: {
-                                if answerNumber == "0" {
-                                    answerNumber = item.displayName
-                                }else {
-                                    answerNumber += item.displayName
+                                if item.isNumber { // item이 숫자이면
+                                    if isClear {
+                                        answerNumber = answerNumber == "0" ? item.displayName : answerNumber + item.displayName
+                                    }else {
+                                        beforeNumber = Double(answerNumber) ?? 0.0
+                                        answerNumber = item.displayName
+                                        isClear = true
+                                    }
+                                }else { // item이 기호이면
+                                    print(beforeNumber)
+                                    if item == .clear {
+                                        answerNumber = "0"
+                                        operatorType = .none
+                                        isClear = true
+                                        beforeNumber = 0
+                                    }else if item.isSingle { // item이 단일연산이면
+                                        answerNumber = trans(item, Double(answerNumber) ?? 0.0)
+                                    }else {
+                                        if operatorType != .none && operatorType != .equal {
+                                            answerNumber = calculation(operatorType, beforeNumber, Double(answerNumber) ?? 0.0)
+                                        }
+                                        operatorType = item
+                                        isClear = false
+                                    }
+                                    
+                                    
                                 }
+                                
                             }, label: {
                                 Text(item.displayName)
-                                    .frame(width: 80,
+                                    .frame(width: item == .zero ? 170 : 80,
                                            height: 80)
-                                    .background(item.backgroundColor)
-                                    .clipShape(.circle)
-                                    .foregroundColor(item.foregroundColor)
+                                    .background(operatorType == item ? .white : item.backgroundColor)
+                                    .cornerRadius(40)
+                                    .foregroundColor(operatorType == item ? .orange : item.foregroundColor)
                                     .font(.system(size: 33))
                             })
                         }
@@ -119,6 +162,46 @@ struct ContentView: View {
             }
         }
        
+    }
+    // 연산하기
+    func calculation(_ item: ButtonType,_ tempNumber: Double,_ currentNumber: Double) -> String {
+        var result = tempNumber
+        switch item {
+        case .division:
+            result /= currentNumber
+        case .multiplivation:
+            result *= currentNumber
+        case .minus:
+            result -= currentNumber
+        case .plus:
+            result += currentNumber
+        default:
+            return String(currentNumber)
+        }
+        print(result)
+        return result == Double(Int(result)) ? String(Int(result)) : String(result)
+    }
+    
+    // 변환하기
+    func trans(_ item: ButtonType,_ currentNumber: Double) -> String {
+        switch item {
+        case .not:
+            if currentNumber == Double(Int(currentNumber)) {
+                return String(Int(-currentNumber))
+            }else {
+                return String(-currentNumber)
+            }
+        case .percent:
+            return String(currentNumber / 100)
+        case .point:
+            if currentNumber == Double(Int(currentNumber)) {
+                return String(Int(currentNumber)) + "."
+            }else {
+                return String(currentNumber)
+            }
+        default:
+            return currentNumber == Double(Int(currentNumber)) ? String(Int(currentNumber)) : String(currentNumber)
+        }
     }
 }
 
